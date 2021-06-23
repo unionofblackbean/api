@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/leungyauming/api/config"
+	"github.com/leungyauming/api/rest"
 	"github.com/leungyauming/api/utils"
 	"log"
 	"os"
@@ -51,8 +52,10 @@ func main() {
 		log.Fatalf("failed to save default config -> %v", err)
 	}
 
-	_, err = config.ParseFile(configPath)
+	config, err := config.ParseFile(configPath)
 	if err != nil {
 		log.Fatalf("failed to load config -> %v", err)
 	}
+
+	log.Fatal(rest.Run(config.Rest.BindAddr, config.Rest.BindPort))
 }
