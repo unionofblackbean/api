@@ -3,9 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/leungyauming/api/config"
-	"github.com/leungyauming/api/rest"
-	"github.com/leungyauming/api/utils"
+	"github.com/leungyauming/api/common/config"
+	"github.com/leungyauming/api/common/utils"
+	"github.com/leungyauming/api/services/rest"
 	"log"
 	"os"
 	"path/filepath"
