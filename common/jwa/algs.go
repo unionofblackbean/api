@@ -17,5 +17,5 @@ const (
 	AlgPS384 = "PS384"
 	AlgPS512 = "PS512"
 
-	AlgNONE = "none"
+	AlgNone = "none"
 )
