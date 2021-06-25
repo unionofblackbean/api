@@ -1,5 +1,11 @@
 package jws
 
+import (
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
+)
+
 type Header map[string]interface{}
 
 func NewHeader() Header {
@@ -21,4 +27,16 @@ func (h Header) Remove(key string) {
 func (h Header) Exists(key string) bool {
 	_, found := h[key]
 	return found
+}
+
+func (h Header) Encode() ([]byte, error) {
+	hJson, err := json.Marshal(h)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal header -> %v", err)
+	}
+
+	hEncoded := make([]byte, (len(hJson)*8-1)/6+1)
+	base64.RawURLEncoding.Encode(hEncoded, hJson)
+
+	return hEncoded, nil
 }

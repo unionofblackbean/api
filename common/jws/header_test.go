@@ -1,6 +1,8 @@
 package jws
 
 import (
+	"github.com/leungyauming/api/common/jwa"
+	"github.com/leungyauming/api/common/jwt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -36,4 +38,16 @@ func TestHeader_Exists(t *testing.T) {
 	assert.False(t, h.Exists("alg"))
 	h.Set("alg", "RS256")
 	assert.True(t, h.Exists("alg"))
+}
+
+func TestHeader_Encode(t *testing.T) {
+	h := NewHeader()
+
+	h.Set(HeaderParamAlg, jwa.AlgHS256)
+	h.Set(HeaderParamTyp, jwt.TypJWT)
+
+	hEncoded, err := h.Encode()
+	assert.Nil(t, err)
+
+	assert.Equal(t, []byte("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"), hEncoded)
 }
