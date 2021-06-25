@@ -7,6 +7,11 @@ import (
 	"testing"
 )
 
+func TestNewHeader(t *testing.T) {
+	h := NewHeader()
+	assert.NotNil(t, h)
+}
+
 func TestHeader_Get(t *testing.T) {
 	h := NewHeader()
 

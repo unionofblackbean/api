@@ -5,6 +5,11 @@ import (
 	"testing"
 )
 
+func TestNewPayload(t *testing.T) {
+	p := NewPayload()
+	assert.NotNil(t, p)
+}
+
 func TestPayload_Get(t *testing.T) {
 	p := NewPayload()
 
