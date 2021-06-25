@@ -37,3 +37,13 @@ func TestPayload_Exists(t *testing.T) {
 	p.Set("role", "admin")
 	assert.True(t, p.Exists("role"))
 }
+
+func TestPayload_Encode(t *testing.T) {
+	p := NewPayload()
+	p.Set("role", "admin")
+
+	pEncoded, err := p.Encode()
+	assert.Nil(t, err)
+
+	assert.Equal(t, []byte("eyJyb2xlIjoiYWRtaW4ifQ"), pEncoded)
+}
