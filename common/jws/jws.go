@@ -27,29 +27,7 @@ func New() *JWS {
 	}
 }
 
-func (jws *JWS) encodeHeaderPayload() ([]byte, error) {
-	headerEncoded, err := jws.Header.Encode()
-	if err != nil {
-		return nil, fmt.Errorf("failed to encode header -> %v", err)
-	}
-
-	payloadEncoded, err := jws.Payload.Encode()
-	if err != nil {
-		return nil, fmt.Errorf("failed to encode payload -> %v", err)
-	}
-
-	buf := pools.GetBytesBuffer()
-	buf.Write(headerEncoded)
-	buf.WriteRune('.')
-	buf.Write(payloadEncoded)
-
-	headerPayloadEncoded := buf.Bytes()
-	pools.PutBytesBuffer(buf)
-
-	return headerPayloadEncoded, nil
-}
-
-func (jws *JWS) signHS(iSecret interface{}) ([]byte, error) {
+func (jws *JWS) signHS(iSecret interface{}, hpEncoded []byte) ([]byte, error) {
 	var secret []byte
 	switch iSecret.(type) {
 	case string:
@@ -70,28 +48,18 @@ func (jws *JWS) signHS(iSecret interface{}) ([]byte, error) {
 		hashFunc = sha512.New
 	}
 
-	headerPayloadEncoded, err := jws.encodeHeaderPayload()
-	if err != nil {
-		return nil, fmt.Errorf("failed to encode header and payload -> %v", err)
-	}
-
 	signHash := hmac.New(hashFunc, secret)
-	_, err = signHash.Write(headerPayloadEncoded)
+	_, err := signHash.Write(hpEncoded)
 	if err != nil {
 		return nil, fmt.Errorf("failed to write header and payload to HMAC sign function -> %v", err)
 	}
 	return signHash.Sum(nil), nil
 }
 
-func (jws *JWS) signRS(iPriKey interface{}) ([]byte, error) {
+func (jws *JWS) signRS(iPriKey interface{}, hpEncoded []byte) ([]byte, error) {
 	priKey, ok := iPriKey.(*rsa.PrivateKey)
 	if !ok {
 		return nil, errors.New("unknown private key data type -> %v")
-	}
-
-	headerPayloadEncoded, err := jws.encodeHeaderPayload()
-	if err != nil {
-		return nil, fmt.Errorf("failed to encode header and payload -> %v", err)
 	}
 
 	var hashFunc crypto.Hash
@@ -99,15 +67,15 @@ func (jws *JWS) signRS(iPriKey interface{}) ([]byte, error) {
 	switch jws.Header.Get("alg") {
 	case jwa.AlgHS256:
 		hashFunc = crypto.SHA256
-		tmpHashed := sha256.Sum256(headerPayloadEncoded)
+		tmpHashed := sha256.Sum256(hpEncoded)
 		hashed = tmpHashed[:]
 	case jwa.AlgHS384:
 		hashFunc = crypto.SHA384
-		tmpHashed := sha512.Sum384(headerPayloadEncoded)
+		tmpHashed := sha512.Sum384(hpEncoded)
 		hashed = tmpHashed[:]
 	case jwa.AlgHS512:
 		hashFunc = crypto.SHA512
-		tmpHashed := sha512.Sum512(headerPayloadEncoded)
+		tmpHashed := sha512.Sum512(hpEncoded)
 		hashed = tmpHashed[:]
 	}
 
@@ -119,27 +87,22 @@ func (jws *JWS) signRS(iPriKey interface{}) ([]byte, error) {
 	return sign, nil
 }
 
-func (jws *JWS) signES(iPriKey interface{}) ([]byte, error) {
+func (jws *JWS) signES(iPriKey interface{}, hpEncoded []byte) ([]byte, error) {
 	priKey, ok := iPriKey.(*ecdsa.PrivateKey)
 	if !ok {
 		return nil, errors.New("unknown private key data type")
 	}
 
-	headerPayloadEncoded, err := jws.encodeHeaderPayload()
-	if err != nil {
-		return nil, fmt.Errorf("failed to encode header and payload -> %v", err)
-	}
-
 	var hashed []byte
 	switch jws.Header.Get("alg") {
 	case jwa.AlgHS256:
-		tmpHashed := sha256.Sum256(headerPayloadEncoded)
+		tmpHashed := sha256.Sum256(hpEncoded)
 		hashed = tmpHashed[:]
 	case jwa.AlgHS384:
-		tmpHashed := sha512.Sum384(headerPayloadEncoded)
+		tmpHashed := sha512.Sum384(hpEncoded)
 		hashed = tmpHashed[:]
 	case jwa.AlgHS512:
-		tmpHashed := sha512.Sum512(headerPayloadEncoded)
+		tmpHashed := sha512.Sum512(hpEncoded)
 		hashed = tmpHashed[:]
 	}
 
@@ -151,15 +114,10 @@ func (jws *JWS) signES(iPriKey interface{}) ([]byte, error) {
 	return sign, nil
 }
 
-func (jws *JWS) signPS(iPriKey interface{}) ([]byte, error) {
+func (jws *JWS) signPS(iPriKey interface{}, hpEncoded []byte) ([]byte, error) {
 	priKey, ok := iPriKey.(*rsa.PrivateKey)
 	if !ok {
 		return nil, errors.New("unknown private key data type")
-	}
-
-	headerPayloadEncoded, err := jws.encodeHeaderPayload()
-	if err != nil {
-		return nil, fmt.Errorf("failed to encode header and payload -> %v", err)
 	}
 
 	var hashFunc crypto.Hash
@@ -167,15 +125,15 @@ func (jws *JWS) signPS(iPriKey interface{}) ([]byte, error) {
 	switch jws.Header.Get("alg") {
 	case jwa.AlgHS256:
 		hashFunc = crypto.SHA256
-		tmpHashed := sha256.Sum256(headerPayloadEncoded)
+		tmpHashed := sha256.Sum256(hpEncoded)
 		hashed = tmpHashed[:]
 	case jwa.AlgHS384:
 		hashFunc = crypto.SHA384
-		tmpHashed := sha512.Sum384(headerPayloadEncoded)
+		tmpHashed := sha512.Sum384(hpEncoded)
 		hashed = tmpHashed[:]
 	case jwa.AlgHS512:
 		hashFunc = crypto.SHA512
-		tmpHashed := sha512.Sum512(headerPayloadEncoded)
+		tmpHashed := sha512.Sum512(hpEncoded)
 		hashed = tmpHashed[:]
 	}
 
@@ -192,22 +150,38 @@ func (jws *JWS) Sign(secretOrPriKey interface{}) ([]byte, error) {
 		return nil, errors.New("missing alg header parameter")
 	}
 
-	var sign []byte
-	var err error
+	headerEncoded, err := jws.Header.Encode()
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode header -> %v", err)
+	}
 
+	payloadEncoded, err := jws.Payload.Encode()
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode payload -> %v", err)
+	}
+
+	buf := pools.GetBytesBuffer()
+	buf.Write(headerEncoded)
+	buf.WriteRune('.')
+	buf.Write(payloadEncoded)
+	hpEncoded := buf.Bytes()
+
+	var sign []byte
 	alg := jws.Header.Get(HeaderParamAlg)
 	switch alg {
 	case jwa.AlgHS256, jwa.AlgHS384, jwa.AlgHS512:
-		sign, err = jws.signHS(secretOrPriKey)
+		sign, err = jws.signHS(secretOrPriKey, hpEncoded)
 	case jwa.AlgRS256, jwa.AlgRS384, jwa.AlgRS512:
-		sign, err = jws.signRS(secretOrPriKey)
+		sign, err = jws.signRS(secretOrPriKey, hpEncoded)
 	case jwa.AlgES256, jwa.AlgES384, jwa.AlgES512:
-		sign, err = jws.signES(secretOrPriKey)
+		sign, err = jws.signES(secretOrPriKey, hpEncoded)
 	case jwa.AlgPS256, jwa.AlgPS384, jwa.AlgPS512:
-		sign, err = jws.signPS(secretOrPriKey)
+		sign, err = jws.signPS(secretOrPriKey, hpEncoded)
 	default:
 		return nil, errors.New("unknown alg header parameter option")
 	}
+
+	pools.PutBytesBuffer(buf)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to sign jws -> %v", err)
