@@ -2,6 +2,7 @@ package jws
 
 import (
 	"crypto"
+	"crypto/ecdsa"
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/rsa"
@@ -118,6 +119,38 @@ func (jws *JWS) signRS(iPriKey interface{}) ([]byte, error) {
 	return sign, nil
 }
 
+func (jws *JWS) signES(iPriKey interface{}) ([]byte, error) {
+	priKey, ok := iPriKey.(*ecdsa.PrivateKey)
+	if !ok {
+		return nil, errors.New("unknown private key data type")
+	}
+
+	headerPayloadEncoded, err := jws.encodeHeaderPayload()
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode header and payload -> %v", err)
+	}
+
+	var hashed []byte
+	switch jws.Header.Get("alg") {
+	case jwa.AlgHS256:
+		tmpHashed := sha256.Sum256(headerPayloadEncoded)
+		hashed = tmpHashed[:]
+	case jwa.AlgHS384:
+		tmpHashed := sha512.Sum384(headerPayloadEncoded)
+		hashed = tmpHashed[:]
+	case jwa.AlgHS512:
+		tmpHashed := sha512.Sum512(headerPayloadEncoded)
+		hashed = tmpHashed[:]
+	}
+
+	sign, err := ecdsa.SignASN1(rand.Reader, priKey, hashed)
+	if err != nil {
+		return nil, fmt.Errorf("failed to sign header and payload using ECDSA -> %v", err)
+	}
+
+	return sign, nil
+}
+
 func (jws *JWS) Sign(secretOrPriKey interface{}) ([]byte, error) {
 	if !jws.Header.Exists(HeaderParamAlg) {
 		return nil, errors.New("missing alg header parameter")
@@ -132,6 +165,8 @@ func (jws *JWS) Sign(secretOrPriKey interface{}) ([]byte, error) {
 		sign, err = jws.signHS(secretOrPriKey)
 	case jwa.AlgRS256, jwa.AlgRS384, jwa.AlgRS512:
 		sign, err = jws.signRS(secretOrPriKey)
+	case jwa.AlgES256, jwa.AlgES384, jwa.AlgES512:
+		sign, err = jws.signES(secretOrPriKey)
 	}
 
 	if err != nil {
