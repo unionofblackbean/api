@@ -167,6 +167,8 @@ func (jws *JWS) Sign(secretOrPriKey interface{}) ([]byte, error) {
 		sign, err = jws.signRS(secretOrPriKey)
 	case jwa.AlgES256, jwa.AlgES384, jwa.AlgES512:
 		sign, err = jws.signES(secretOrPriKey)
+	default:
+		return nil, errors.New("unknown alg header parameter option")
 	}
 
 	if err != nil {
