@@ -77,7 +77,7 @@ func (jws *JWS) signHS(iSecret interface{}) ([]byte, error) {
 	signHash := hmac.New(hashFunc, secret)
 	_, err = signHash.Write(headerPayloadEncoded)
 	if err != nil {
-		return nil, fmt.Errorf("failed to write jws to sign function -> %v", err)
+		return nil, fmt.Errorf("failed to write header and payload to HMAC sign function -> %v", err)
 	}
 	return signHash.Sum(nil), nil
 }
@@ -112,7 +112,7 @@ func (jws *JWS) signRS(iPriKey interface{}) ([]byte, error) {
 
 	sign, err := rsa.SignPKCS1v15(rand.Reader, priKey, hashFunc, hashed)
 	if err != nil {
-		return nil, fmt.Errorf("failed to sign -> %v", err)
+		return nil, fmt.Errorf("failed to sign header and payload using RSA PKCS #1 v1.5 -> %v", err)
 	}
 
 	return sign, nil
