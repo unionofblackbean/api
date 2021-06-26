@@ -151,6 +151,42 @@ func (jws *JWS) signES(iPriKey interface{}) ([]byte, error) {
 	return sign, nil
 }
 
+func (jws *JWS) signPS(iPriKey interface{}) ([]byte, error) {
+	priKey, ok := iPriKey.(*rsa.PrivateKey)
+	if !ok {
+		return nil, errors.New("unknown private key data type")
+	}
+
+	headerPayloadEncoded, err := jws.encodeHeaderPayload()
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode header and payload -> %v", err)
+	}
+
+	var hashFunc crypto.Hash
+	var hashed []byte
+	switch jws.Header.Get("alg") {
+	case jwa.AlgHS256:
+		hashFunc = crypto.SHA256
+		tmpHashed := sha256.Sum256(headerPayloadEncoded)
+		hashed = tmpHashed[:]
+	case jwa.AlgHS384:
+		hashFunc = crypto.SHA384
+		tmpHashed := sha512.Sum384(headerPayloadEncoded)
+		hashed = tmpHashed[:]
+	case jwa.AlgHS512:
+		hashFunc = crypto.SHA512
+		tmpHashed := sha512.Sum512(headerPayloadEncoded)
+		hashed = tmpHashed[:]
+	}
+
+	sign, err := rsa.SignPSS(rand.Reader, priKey, hashFunc, hashed, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to sign header and payload with RSA using PSS -> %v", err)
+	}
+
+	return sign, nil
+}
+
 func (jws *JWS) Sign(secretOrPriKey interface{}) ([]byte, error) {
 	if !jws.Header.Exists(HeaderParamAlg) {
 		return nil, errors.New("missing alg header parameter")
@@ -167,6 +203,8 @@ func (jws *JWS) Sign(secretOrPriKey interface{}) ([]byte, error) {
 		sign, err = jws.signRS(secretOrPriKey)
 	case jwa.AlgES256, jwa.AlgES384, jwa.AlgES512:
 		sign, err = jws.signES(secretOrPriKey)
+	case jwa.AlgPS256, jwa.AlgPS384, jwa.AlgPS512:
+		sign, err = jws.signPS(secretOrPriKey)
 	default:
 		return nil, errors.New("unknown alg header parameter option")
 	}
