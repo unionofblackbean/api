@@ -66,15 +66,15 @@ func (jws *JWS) signRS(iPriKey interface{}, hpEncoded []byte) ([]byte, error) {
 	var hashFunc crypto.Hash
 	var hashed []byte
 	switch jws.Header.Get("alg") {
-	case jwa.AlgHS256:
+	case jwa.AlgRS256:
 		hashFunc = crypto.SHA256
 		tmpHashed := sha256.Sum256(hpEncoded)
 		hashed = tmpHashed[:]
-	case jwa.AlgHS384:
+	case jwa.AlgRS384:
 		hashFunc = crypto.SHA384
 		tmpHashed := sha512.Sum384(hpEncoded)
 		hashed = tmpHashed[:]
-	case jwa.AlgHS512:
+	case jwa.AlgRS512:
 		hashFunc = crypto.SHA512
 		tmpHashed := sha512.Sum512(hpEncoded)
 		hashed = tmpHashed[:]
@@ -96,13 +96,13 @@ func (jws *JWS) signES(iPriKey interface{}, hpEncoded []byte) ([]byte, error) {
 
 	var hashed []byte
 	switch jws.Header.Get("alg") {
-	case jwa.AlgHS256:
+	case jwa.AlgES256:
 		tmpHashed := sha256.Sum256(hpEncoded)
 		hashed = tmpHashed[:]
-	case jwa.AlgHS384:
+	case jwa.AlgES384:
 		tmpHashed := sha512.Sum384(hpEncoded)
 		hashed = tmpHashed[:]
-	case jwa.AlgHS512:
+	case jwa.AlgES512:
 		tmpHashed := sha512.Sum512(hpEncoded)
 		hashed = tmpHashed[:]
 	}
@@ -124,15 +124,15 @@ func (jws *JWS) signPS(iPriKey interface{}, hpEncoded []byte) ([]byte, error) {
 	var hashFunc crypto.Hash
 	var hashed []byte
 	switch jws.Header.Get("alg") {
-	case jwa.AlgHS256:
+	case jwa.AlgPS256:
 		hashFunc = crypto.SHA256
 		tmpHashed := sha256.Sum256(hpEncoded)
 		hashed = tmpHashed[:]
-	case jwa.AlgHS384:
+	case jwa.AlgPS384:
 		hashFunc = crypto.SHA384
 		tmpHashed := sha512.Sum384(hpEncoded)
 		hashed = tmpHashed[:]
-	case jwa.AlgHS512:
+	case jwa.AlgPS512:
 		hashFunc = crypto.SHA512
 		tmpHashed := sha512.Sum512(hpEncoded)
 		hashed = tmpHashed[:]
