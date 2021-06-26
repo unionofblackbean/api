@@ -8,6 +8,7 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"crypto/sha512"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"github.com/leungyauming/api/common/jwa"
@@ -180,12 +181,14 @@ func (jws *JWS) Sign(secretOrPriKey interface{}) ([]byte, error) {
 	default:
 		return nil, errors.New("unknown alg header parameter option")
 	}
-
-	pools.PutBytesBuffer(buf)
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to sign jws -> %v", err)
 	}
 
-	return sign, nil
+	pools.PutBytesBuffer(buf)
+
+	signEncoded := make([]byte, (len(sign)*8-1)/6+1)
+	base64.RawURLEncoding.Encode(signEncoded, sign)
+
+	return signEncoded, nil
 }
