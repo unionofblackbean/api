@@ -23,16 +23,16 @@ func TestHeader_Get(t *testing.T) {
 func TestHeader_Set(t *testing.T) {
 	h := NewHeader()
 
+	assert.False(t, h.Exists(HeaderParamAlg))
 	h.Set(HeaderParamAlg, jwa.AlgRS256)
 	assert.True(t, h.Exists(HeaderParamAlg))
 }
 
 func TestHeader_Remove(t *testing.T) {
 	h := NewHeader()
-
 	h.Set(HeaderParamAlg, jwa.AlgRS256)
-	assert.True(t, h.Exists(HeaderParamAlg))
 
+	assert.True(t, h.Exists(HeaderParamAlg))
 	h.Remove(HeaderParamAlg)
 	assert.False(t, h.Exists(HeaderParamAlg))
 }
@@ -47,7 +47,6 @@ func TestHeader_Exists(t *testing.T) {
 
 func TestHeader_Encode(t *testing.T) {
 	h := NewHeader()
-
 	h.Set(HeaderParamAlg, jwa.AlgHS256)
 	h.Set(HeaderParamTyp, jwt.TypJWT)
 

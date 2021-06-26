@@ -21,16 +21,16 @@ func TestPayload_Get(t *testing.T) {
 func TestPayload_Set(t *testing.T) {
 	p := NewPayload()
 
+	assert.False(t, p.Exists("role"))
 	p.Set("role", "admin")
 	assert.True(t, p.Exists("role"))
 }
 
 func TestPayload_Remove(t *testing.T) {
 	p := NewPayload()
-
 	p.Set("role", "admin")
-	assert.True(t, p.Exists("role"))
 
+	assert.True(t, p.Exists("role"))
 	p.Remove("role")
 	assert.False(t, p.Exists("role"))
 }
