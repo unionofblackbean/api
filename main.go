@@ -52,10 +52,10 @@ func main() {
 		log.Fatalf("failed to save default config -> %v", err)
 	}
 
-	config, err := config.ParseFile(configPath)
+	cfg, err := config.ParseFile(configPath)
 	if err != nil {
 		log.Fatalf("failed to load config -> %v", err)
 	}
 
-	log.Fatal(rest.Run(config.Rest.BindAddr, config.Rest.BindPort))
+	log.Fatal(rest.Run(cfg.Rest.BindAddr, cfg.Rest.BindPort))
 }
