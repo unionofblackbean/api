@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/leungyauming/api/common/config"
+	"github.com/leungyauming/api/app/config"
 	"github.com/leungyauming/api/common/utils"
 	"github.com/leungyauming/api/services/rest"
 	"log"
@@ -15,6 +15,13 @@ var defaultConfig = config.Config{
 	Rest: config.RestConfig{
 		BindAddr: "127.0.0.1",
 		BindPort: 8080,
+	},
+	DB: config.DBConfig{
+		Addr:     "127.0.0.1",
+		Port:     5432,
+		Username: "api",
+		Password: "api",
+		DBName:   "api",
 	},
 }
 var configPath = "config.json"
@@ -57,5 +64,5 @@ func main() {
 		log.Fatalf("failed to load config -> %v", err)
 	}
 
-	log.Fatal(rest.Run(cfg.Rest.BindAddr, cfg.Rest.BindPort))
+	log.Fatal(rest.Start(cfg.Rest.BindAddr, cfg.Rest.BindPort))
 }
