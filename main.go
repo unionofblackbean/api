@@ -1,9 +1,9 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/leungyauming/api/app"
 	"github.com/leungyauming/api/app/config"
 	"github.com/leungyauming/api/common/utils"
 	"github.com/leungyauming/api/services/rest"
@@ -66,20 +66,36 @@ func main() {
 		log.Fatalf("failed to load config -> %v", err)
 	}
 
-	restService := rest.New(cfg.Rest)
-	go restService.Start()
-	log.Println("started rest service")
+	app_ := app.New()
+	app_.RegisterService(rest.New(cfg.Rest))
 
-	{
-		shouldExit := make(chan os.Signal)
-		signal.Notify(shouldExit, os.Interrupt)
-		<-shouldExit
+	log.Println("starting services")
+	errChan := make(chan error)
+	app_.Start(errChan)
+	log.Println("started all services")
+
+	shouldExit := make(chan os.Signal)
+	signal.Notify(shouldExit, os.Interrupt)
+	shouldShutdown := false
+	for {
+		if shouldShutdown {
+			break
+		}
+
+		select {
+		case err := <-errChan:
+			if err != nil {
+				log.Println(err)
+			}
+		case <-shouldExit:
+			shouldShutdown = true
+		}
 	}
+
 	log.Println("shutting down services")
-
-	err = restService.Shutdown(context.Background())
-	if err != nil {
-		log.Println("failed to shutdown rest service")
+	errs := app_.Shutdown()
+	for err := range errs {
+		log.Printf("failed to shutdown services -> %v", err)
 	}
-	log.Println("shut down rest service")
+	log.Println("shut down all services")
 }

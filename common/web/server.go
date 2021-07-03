@@ -27,6 +27,7 @@ func NewServer(addr string, port uint16) *Server {
 	return srv
 }
 
+// Start implements app.Service interface
 func (srv *Server) Start() error {
 	return srv.httpSrv.ListenAndServe()
 }
