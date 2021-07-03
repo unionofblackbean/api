@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/leungyauming/api/app/config"
@@ -8,15 +9,16 @@ import (
 	"github.com/leungyauming/api/services/rest"
 	"log"
 	"os"
+	"os/signal"
 	"path/filepath"
 )
 
 var defaultConfig = config.Config{
-	Rest: config.RestConfig{
+	Rest: &config.RestConfig{
 		BindAddr: "127.0.0.1",
 		BindPort: 8080,
 	},
-	DB: config.DBConfig{
+	DB: &config.DBConfig{
 		Addr:     "127.0.0.1",
 		Port:     5432,
 		Username: "api",
@@ -64,5 +66,20 @@ func main() {
 		log.Fatalf("failed to load config -> %v", err)
 	}
 
-	log.Fatal(rest.Start(cfg.Rest.BindAddr, cfg.Rest.BindPort))
+	restService := rest.New(cfg.Rest)
+	go restService.Start()
+	log.Println("started rest service")
+
+	{
+		shouldExit := make(chan os.Signal)
+		signal.Notify(shouldExit, os.Interrupt)
+		<-shouldExit
+	}
+	log.Println("shutting down services")
+
+	err = restService.Shutdown(context.Background())
+	if err != nil {
+		log.Println("failed to shutdown rest service")
+	}
+	log.Println("shut down rest service")
 }

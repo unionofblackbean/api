@@ -1,12 +1,12 @@
 package rest
 
 import (
-	"fmt"
-	"github.com/gin-gonic/gin"
+	"github.com/leungyauming/api/app/config"
+	"github.com/leungyauming/api/common/web"
 )
 
-func Start(addr string, port uint16) error {
-	r := gin.Default()
+func New(cfg *config.RestConfig) *web.Server {
+	srv := web.NewServer(cfg.BindAddr, cfg.BindPort)
 
-	return r.Run(fmt.Sprintf("%s:%d", addr, port))
+	return srv
 }
