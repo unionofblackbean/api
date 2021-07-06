@@ -6,6 +6,7 @@ import (
 	"github.com/leungyauming/api/app"
 	"github.com/leungyauming/api/app/config"
 	"github.com/leungyauming/api/common/web"
+	"github.com/leungyauming/api/services/rest/controllers"
 	"github.com/leungyauming/api/services/rest/controllers/v1/user"
 )
 
@@ -31,12 +32,14 @@ func New(cfg *config.RestConfig, dbPool *pgxpool.Pool) app.Service {
 		userGroup := v1Group.Group("/user")
 		{
 			loginController := user.NewLoginController(dbPool)
-			userGroup.POST("/login", loginController.Post)
+			userGroup.Any("/login", loginController.Any)
 
 			registerController := user.NewRegisterController(dbPool)
-			userGroup.POST("/register", registerController.Post)
+			userGroup.Any("/register", registerController.Any)
 		}
 	}
+
+	srv.NoRoute(controllers.NoRoute)
 
 	return &restService{webSrv: srv}
 }
