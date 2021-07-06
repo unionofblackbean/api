@@ -1,8 +1,12 @@
 package main
 
 import (
+	"context"
+	_ "embed"
 	"encoding/json"
+	"flag"
 	"fmt"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/leungyauming/api/app"
 	"github.com/leungyauming/api/app/config"
 	"github.com/leungyauming/api/common/utils"
@@ -13,20 +17,22 @@ import (
 	"path/filepath"
 )
 
-var defaultConfig = config.Config{
-	Rest: &config.RestConfig{
-		BindAddr: "127.0.0.1",
-		BindPort: 8080,
-	},
-	DB: &config.DBConfig{
-		Addr:     "127.0.0.1",
-		Port:     5432,
-		Username: "api",
-		Password: "api",
-		DBName:   "api",
-	},
-}
-var configPath = "config.json"
+var (
+	defaultConfig = config.Config{
+		Rest: &config.RestConfig{
+			BindAddr: "127.0.0.1",
+			BindPort: 8080,
+		},
+		DB: &config.DBConfig{
+			Addr:     "127.0.0.1",
+			Port:     5432,
+			Username: "api",
+			Password: "api",
+			DBName:   "api",
+		},
+	}
+	configPath = "config.json"
+)
 
 func saveDefaultConfig() error {
 	execDir, err := utils.ExecutableDirectory()
@@ -55,7 +61,36 @@ func saveDefaultConfig() error {
 	return nil
 }
 
+func initDbPool(cfg *config.DBConfig) (*pgxpool.Pool, error) {
+	pool, err := pgxpool.Connect(context.Background(),
+		fmt.Sprintf("postgres://%s:%s@%s:%d/%s",
+			cfg.Username, cfg.Password,
+			cfg.Addr, cfg.Port,
+			cfg.DBName))
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect database -> %v", err)
+	}
+
+	return pool, nil
+}
+
+//go:embed schema.sql
+var dbSchema string
+
+func initDb(db *pgxpool.Pool) error {
+	_, err := db.Exec(context.Background(), dbSchema)
+	return err
+}
+
+var shouldInit bool
+
+func init() {
+	flag.BoolVar(&shouldInit, "init", false, "initialization trigger")
+}
+
 func main() {
+	flag.Parse()
+
 	err := saveDefaultConfig()
 	if err != nil {
 		log.Fatalf("failed to save default config -> %v", err)
@@ -66,8 +101,24 @@ func main() {
 		log.Fatalf("failed to load config -> %v", err)
 	}
 
+	dbPool, err := initDbPool(cfg.DB)
+	if err != nil {
+		log.Fatalf("failed to initialize database connection pool -> %v", err)
+	}
+
+	if shouldInit {
+		log.Println("initializing")
+
+		err := initDb(dbPool)
+		if err != nil {
+			log.Fatalf("failed to initialize database -> %v", err)
+		}
+
+		log.Println("initialized")
+	}
+
 	app_ := app.New()
-	app_.RegisterService(rest.New(cfg.Rest))
+	app_.RegisterService(rest.New(cfg.Rest, dbPool))
 
 	log.Println("starting services")
 	errChan := make(chan error)
