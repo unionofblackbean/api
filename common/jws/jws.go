@@ -146,6 +146,29 @@ func (jws *JWS) signPS(iPriKey interface{}, hpEncoded []byte) ([]byte, error) {
 	return sign, nil
 }
 
+func (jws *JWS) sign(secretOrPriKey interface{}, hpEncoded []byte) ([]byte, error) {
+	var sign []byte
+	var err error
+	alg := jws.Header.Get(HeaderParamAlg)
+	switch alg {
+	case jwa.AlgHS256, jwa.AlgHS384, jwa.AlgHS512:
+		sign, err = jws.signHS(secretOrPriKey, hpEncoded)
+	case jwa.AlgRS256, jwa.AlgRS384, jwa.AlgRS512:
+		sign, err = jws.signRS(secretOrPriKey, hpEncoded)
+	case jwa.AlgES256, jwa.AlgES384, jwa.AlgES512:
+		sign, err = jws.signES(secretOrPriKey, hpEncoded)
+	case jwa.AlgPS256, jwa.AlgPS384, jwa.AlgPS512:
+		sign, err = jws.signPS(secretOrPriKey, hpEncoded)
+	default:
+		return nil, errors.New("unknown alg header parameter option")
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to sign jws -> %v", err)
+	}
+
+	return sign, err
+}
+
 func (jws *JWS) Sign(secretOrPriKey interface{}) ([]byte, error) {
 	if !jws.Header.Exists(HeaderParamAlg) {
 		return nil, errors.New("missing alg header parameter")
@@ -167,22 +190,9 @@ func (jws *JWS) Sign(secretOrPriKey interface{}) ([]byte, error) {
 	buf.Write(payloadEncoded)
 	hpEncoded := buf.Bytes()
 
-	var sign []byte
-	alg := jws.Header.Get(HeaderParamAlg)
-	switch alg {
-	case jwa.AlgHS256, jwa.AlgHS384, jwa.AlgHS512:
-		sign, err = jws.signHS(secretOrPriKey, hpEncoded)
-	case jwa.AlgRS256, jwa.AlgRS384, jwa.AlgRS512:
-		sign, err = jws.signRS(secretOrPriKey, hpEncoded)
-	case jwa.AlgES256, jwa.AlgES384, jwa.AlgES512:
-		sign, err = jws.signES(secretOrPriKey, hpEncoded)
-	case jwa.AlgPS256, jwa.AlgPS384, jwa.AlgPS512:
-		sign, err = jws.signPS(secretOrPriKey, hpEncoded)
-	default:
-		return nil, errors.New("unknown alg header parameter option")
-	}
+	sign, err := jws.sign(secretOrPriKey, hpEncoded)
 	if err != nil {
-		return nil, fmt.Errorf("failed to sign jws -> %v", err)
+		return nil, err
 	}
 
 	pools.PutBytesBuffer(buf)
@@ -191,4 +201,41 @@ func (jws *JWS) Sign(secretOrPriKey interface{}) ([]byte, error) {
 	base64.RawURLEncoding.Encode(signEncoded, sign)
 
 	return signEncoded, nil
+}
+
+func (jws *JWS) Build(secretOrPriKey interface{}) ([]byte, error) {
+	if !jws.Header.Exists(HeaderParamAlg) {
+		return nil, errors.New("missing alg header parameter")
+	}
+
+	headerEncoded, err := jws.Header.Encode()
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode header -> %v", err)
+	}
+
+	payloadEncoded, err := jws.Payload.Encode()
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode payload -> %v", err)
+	}
+
+	buf := pools.GetBytesBuffer()
+	defer pools.PutBytesBuffer(buf)
+
+	buf.Write(headerEncoded)
+	buf.WriteRune('.')
+	buf.Write(payloadEncoded)
+	hpEncoded := buf.Bytes()
+
+	sign, err := jws.sign(secretOrPriKey, hpEncoded)
+	if err != nil {
+		return nil, err
+	}
+
+	signEncoded := make([]byte, (len(sign)*8-1)/6+1)
+	base64.RawURLEncoding.Encode(signEncoded, sign)
+
+	buf.WriteRune('.')
+	buf.Write(signEncoded)
+
+	return buf.Bytes(), nil
 }
