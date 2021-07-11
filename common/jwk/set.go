@@ -10,7 +10,10 @@ type Set struct {
 }
 
 func NewSet() *Set {
-	return new(Set)
+	set := new(Set)
+	set.Keys = []JWK{}
+
+	return set
 }
 
 func (s *Set) AddKey(jwk JWK) {
