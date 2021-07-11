@@ -6,19 +6,19 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/leungyauming/api/app"
 	"github.com/leungyauming/api/common/responses"
 	"github.com/leungyauming/api/common/security"
 	"net/http"
 )
 
 type LoginController struct {
-	db *pgxpool.Pool
+	deps *app.Deps
 }
 
-func NewLoginController(db *pgxpool.Pool) *LoginController {
+func NewLoginController(deps *app.Deps) *LoginController {
 	c := new(LoginController)
-	c.db = db
+	c.deps = deps
 
 	return c
 }
@@ -36,7 +36,7 @@ func (c *LoginController) Any(ctx *gin.Context) {
 		}
 
 		var dbPwHashEncoded string
-		err := c.db.QueryRow(context.Background(),
+		err := c.deps.Database.QueryRow(context.Background(),
 			"SELECT password_hash_encoded FROM users WHERE username=$1;",
 			reqUsername,
 		).Scan(&dbPwHashEncoded)
@@ -71,7 +71,7 @@ func (c *LoginController) Any(ctx *gin.Context) {
 
 		sessionIDString := sessionID.String()
 
-		_, err = c.db.Exec(context.Background(),
+		_, err = c.deps.Database.Exec(context.Background(),
 			"INSERT INTO sessions(id, username, ip) VALUES ($1, $2, $3);",
 			sessionIDString, reqUsername, ctx.ClientIP())
 		if err != nil {

@@ -2,9 +2,7 @@ package rest
 
 import (
 	"context"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/leungyauming/api/app"
-	"github.com/leungyauming/api/app/config"
 	"github.com/leungyauming/api/common/web"
 	"github.com/leungyauming/api/services/rest/controllers"
 	"github.com/leungyauming/api/services/rest/controllers/v1/user"
@@ -24,17 +22,17 @@ func (service *restService) Shutdown() error {
 	return service.webSrv.Shutdown(context.Background())
 }
 
-func New(cfg *config.RestConfig, dbPool *pgxpool.Pool) app.Service {
-	srv := web.NewServer(cfg.BindAddr, cfg.BindPort)
+func New(deps *app.Deps) app.Service {
+	srv := web.NewServer(deps.Config.Rest.BindAddr, deps.Config.Rest.BindPort)
 
 	v1Group := srv.Group("/v1")
 	{
 		userGroup := v1Group.Group("/user")
 		{
-			loginController := user.NewLoginController(dbPool)
+			loginController := user.NewLoginController(deps)
 			userGroup.Any("/login", loginController.Any)
 
-			registerController := user.NewRegisterController(dbPool)
+			registerController := user.NewRegisterController(deps)
 			userGroup.Any("/register", registerController.Any)
 		}
 	}

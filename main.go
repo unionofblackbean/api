@@ -46,8 +46,13 @@ func main() {
 		log.Println("initialized")
 	}
 
-	app_ := app.New()
-	app_.RegisterService(rest.New(cfg.Rest, dbPool))
+	deps := &app.Deps{
+		Database: dbPool,
+		Config:   cfg,
+	}
+
+	app_ := app.New(deps)
+	app_.RegisterService(rest.New(deps))
 
 	log.Println("starting services")
 	errChan := make(chan error)
