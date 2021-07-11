@@ -1,18 +1,15 @@
 package app
 
-import (
-	"github.com/jackc/pgx/v4/pgxpool"
-)
-
 type App struct {
 	services []Service
 
-	db *pgxpool.Pool
+	deps *Deps
 }
 
-func New() *App {
+func New(deps *Deps) *App {
 	app := new(App)
 	app.services = []Service{}
+	app.deps = deps
 
 	return app
 }

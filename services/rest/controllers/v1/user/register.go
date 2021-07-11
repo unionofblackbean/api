@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/leungyauming/api/app"
 	"github.com/leungyauming/api/common/responses"
 	"github.com/leungyauming/api/common/security"
 	"net/http"
@@ -12,12 +12,12 @@ import (
 )
 
 type RegisterController struct {
-	db *pgxpool.Pool
+	deps *app.Deps
 }
 
-func NewRegisterController(db *pgxpool.Pool) *RegisterController {
+func NewRegisterController(deps *app.Deps) *RegisterController {
 	c := new(RegisterController)
-	c.db = db
+	c.deps = deps
 
 	return c
 }
@@ -46,7 +46,7 @@ func (c *RegisterController) Any(ctx *gin.Context) {
 		email := emailAddr.Address
 
 		var userAlreadyExists bool
-		err = c.db.QueryRow(context.Background(),
+		err = c.deps.Database.QueryRow(context.Background(),
 			"SELECT EXISTS(SELECT 1 FROM users WHERE username=$1);",
 			usernameForm).Scan(&userAlreadyExists)
 		if err != nil {
@@ -65,7 +65,7 @@ func (c *RegisterController) Any(ctx *gin.Context) {
 		salt, pwHash, err := security.Argon2idHashPassword(passwordForm, security.DefaultArgon2idParams)
 		pwHashEncoded := security.Argon2idEncodePasswordHash(salt, pwHash, security.DefaultArgon2idParams)
 
-		_, err = c.db.Exec(context.Background(),
+		_, err = c.deps.Database.Exec(context.Background(),
 			"INSERT INTO users(username, email, password_hash_encoded) VALUES ($1, $2, $3);",
 			usernameForm, email, pwHashEncoded)
 		if err != nil {
