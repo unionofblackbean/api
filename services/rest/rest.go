@@ -6,6 +6,8 @@ import (
 	"github.com/leungyauming/api/common/web"
 	"github.com/leungyauming/api/services/rest/controllers"
 	"github.com/leungyauming/api/services/rest/controllers/v1/user"
+	"log"
+	"net/http"
 )
 
 type restService struct {
@@ -14,12 +16,24 @@ type restService struct {
 
 // Start implements app.Service interface
 func (service *restService) Start() error {
-	return service.webSrv.Start()
+	go func() {
+		err := service.webSrv.Start()
+		if err != http.ErrServerClosed {
+			log.Printf("failed to start web server -> %v", err)
+		}
+	}()
+
+	return nil
 }
 
 // Shutdown implements app.Service interface
 func (service *restService) Shutdown() error {
 	return service.webSrv.Shutdown(context.Background())
+}
+
+// Name implements app.Service interface
+func (service *restService) Name() string {
+	return "REST"
 }
 
 func New(deps *app.Deps) app.Service {

@@ -1,5 +1,7 @@
 package app
 
+import "fmt"
+
 type App struct {
 	services []Service
 
@@ -18,12 +20,14 @@ func (app *App) RegisterService(service Service) {
 	app.services = append(app.services, service)
 }
 
-func (app *App) Start(errChan chan error) {
+func (app *App) Start() error {
 	for _, service := range app.services {
-		go func(service Service) {
-			errChan <- service.Start()
-		}(service)
+		if err := service.Start(); err != nil {
+			return fmt.Errorf(`failed to start "%s" service -> %v`, service.Name(), err)
+		}
 	}
+
+	return nil
 }
 
 func (app *App) Shutdown() []error {

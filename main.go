@@ -55,29 +55,16 @@ func main() {
 	app_.RegisterService(rest.New(deps))
 
 	log.Println("starting services")
-	errChan := make(chan error)
-	app_.Start(errChan)
+	err = app_.Start()
+	if err != nil {
+		log.Fatalf("failed to start app -> %v", err)
+	}
 	log.Println("started all services")
 
 	{
-		shouldExit := make(chan os.Signal)
-		signal.Notify(shouldExit, os.Interrupt)
-
-		shouldShutdown := false
-		for {
-			if shouldShutdown {
-				break
-			}
-
-			select {
-			case err := <-errChan:
-				if err != nil {
-					log.Println(err)
-				}
-			case <-shouldExit:
-				shouldShutdown = true
-			}
-		}
+		shutdownCh := make(chan os.Signal)
+		signal.Notify(shutdownCh, os.Interrupt)
+		<-shutdownCh
 	}
 
 	log.Println("shutting down services")
