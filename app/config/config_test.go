@@ -7,11 +7,34 @@ import (
 	"testing"
 )
 
-var testConfigString = `{"rest":{"bind_addr":"127.0.0.1","bind_port":8080}}`
+var testConfigString = `{
+	"rest": {
+		"bind_addr": "127.0.0.1",
+		"bind_port": 8080
+	},
+	"db": {
+		"addr": "127.0.0.1",
+		"port": 5432,
+		"username": "api",
+		"password": "api",
+		"db_name": "api"
+	}
+}`
 
 func checkConfigValues(t *testing.T, config *Config) {
-	assert.Equal(t, "127.0.0.1", config.Rest.BindAddr)
-	assert.EqualValues(t, 8080, config.Rest.BindPort)
+	assert.Equal(t, &Config{
+		Rest: &RestConfig{
+			BindAddr: "127.0.0.1",
+			BindPort: 8080,
+		},
+		DB: &DBConfig{
+			Addr:     "127.0.0.1",
+			Port:     5432,
+			Username: "api",
+			Password: "api",
+			DBName:   "api",
+		},
+	}, config)
 }
 
 func TestParse(t *testing.T) {
