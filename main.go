@@ -69,8 +69,11 @@ func main() {
 
 	log.Println("shutting down services")
 	errs := app_.Shutdown()
-	for err := range errs {
-		log.Printf("failed to shutdown services -> %v", err)
+	if len(errs) == 0 {
+		log.Println("shut down all services")
+	} else {
+		for err := range errs {
+			log.Printf("failed to shutdown services -> %v", err)
+		}
 	}
-	log.Println("shut down all services")
 }
