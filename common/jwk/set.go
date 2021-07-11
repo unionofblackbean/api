@@ -9,6 +9,10 @@ type Set struct {
 	Keys []JWK `json:"keys"`
 }
 
+func NewSet() *Set {
+	return new(Set)
+}
+
 func (s *Set) AddKey(jwk JWK) {
 	s.Keys = append(s.Keys, jwk)
 }
@@ -24,8 +28,4 @@ func (s *Set) Build() ([]byte, error) {
 	}
 
 	return sj, err
-}
-
-func NewSet() *Set {
-	return new(Set)
 }
