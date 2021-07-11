@@ -1,14 +1,18 @@
 CREATE TABLE users
 (
-    id                    SERIAL PRIMARY KEY,
-    username              TEXT,
-    email                 TEXT,
-    password_hash_encoded TEXT
+    user_id                    SERIAL,
+    user_username              TEXT,
+    user_email                 TEXT,
+    user_password_hash_encoded TEXT,
+    PRIMARY KEY (user_id)
 );
 
 CREATE TABLE sessions
 (
-    id       TEXT,
-    username TEXT,
-    ip       TEXT
+    session_id    TEXT,
+    session_ip    TEXT,
+    user_username TEXT
 );
+
+ALTER TABLE sessions
+    ADD FOREIGN KEY (user_username) REFERENCES users (user_username);
