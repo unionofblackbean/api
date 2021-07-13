@@ -11,10 +11,14 @@ import (
 	"os/signal"
 )
 
-var shouldInitDb bool
+var (
+	shouldInitDb  bool
+	shouldInitCfg bool
+)
 
 func init() {
 	flag.BoolVar(&shouldInitDb, "init-db", false, "database initialization trigger")
+	flag.BoolVar(&shouldInitCfg, "only-cfg", false, "only creates config trigger")
 }
 
 func Main() int {
@@ -26,6 +30,9 @@ func Main() int {
 	if err != nil {
 		logger.Printf("failed to save default config -> %v", err)
 		return 1
+	}
+	if shouldInitCfg {
+		return 0
 	}
 
 	cfg, err := config.ParseFile(configPath)
