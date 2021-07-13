@@ -7,8 +7,7 @@ import (
 )
 
 type Config struct {
-	Rest *RestConfig `json:"rest"`
-	DB   *DBConfig   `json:"db"`
+	App *AppConfig `json:"app"`
 }
 
 func Parse(content []byte) (*Config, error) {

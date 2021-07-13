@@ -37,7 +37,7 @@ func (service *restService) Name() string {
 }
 
 func New(deps *app.Deps) app.Service {
-	srv := web.NewServer(deps.Config.Rest.BindAddr, deps.Config.Rest.BindPort)
+	srv := web.NewServer(deps.Config.App.Services.Rest.BindAddr, deps.Config.App.Services.Rest.BindPort)
 
 	v1Group := srv.Group("/v1")
 	{

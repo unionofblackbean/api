@@ -30,7 +30,7 @@ func main() {
 		log.Fatalf("failed to load config -> %v", err)
 	}
 
-	dbPool, err := initDbPool(cfg.DB)
+	dbPool, err := initDbPool(cfg.App.DB)
 	if err != nil {
 		log.Fatalf("failed to initialize database connection pool -> %v", err)
 	}

@@ -10,17 +10,22 @@ import (
 )
 
 var (
-	defaultConfig = config.Config{
-		Rest: &config.RestConfig{
-			BindAddr: "127.0.0.1",
-			BindPort: 8080,
-		},
-		DB: &config.DBConfig{
-			Addr:     "127.0.0.1",
-			Port:     5432,
-			Username: "api",
-			Password: "api",
-			DBName:   "api",
+	defaultConfig = &config.Config{
+		App: &config.AppConfig{
+			StartPolicy: config.StartPolicyExitOnError,
+			DB: &config.DBConfig{
+				Addr:     "127.0.0.1",
+				Port:     5432,
+				Username: "api",
+				Password: "api",
+				DBName:   "api",
+			},
+			Services: &config.ServicesConfig{
+				Rest: &config.RestConfig{
+					BindAddr: "127.0.0.1",
+					BindPort: 8080,
+				},
+			},
 		},
 	}
 	configPath = "config.json"
@@ -39,7 +44,7 @@ func saveDefaultConfig() error {
 			return fmt.Errorf("failed to create config file -> %v", err)
 		}
 
-		configBytes, err := json.MarshalIndent(&defaultConfig, "", "  ")
+		configBytes, err := json.MarshalIndent(defaultConfig, "", "  ")
 		if err != nil {
 			return fmt.Errorf("failed to marshal default config struct -> %v", err)
 		}

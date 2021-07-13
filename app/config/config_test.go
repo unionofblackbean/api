@@ -8,31 +8,41 @@ import (
 )
 
 var testConfigString = `{
-	"rest": {
-		"bind_addr": "127.0.0.1",
-		"bind_port": 8080
-	},
-	"db": {
-		"addr": "127.0.0.1",
-		"port": 5432,
-		"username": "api",
-		"password": "api",
-		"db_name": "api"
+	"app": {
+		"start_policy": "exit_on_error",
+		"db": {
+			"addr": "127.0.0.1",
+			"port": 5432,
+			"username": "api",
+			"password": "api",
+			"db_name": "api"
+		},
+		"services": {
+			"rest": {
+				"bind_addr": "127.0.0.1",
+				"bind_port": 8080
+			}
+		}
 	}
 }`
 
 func checkConfigValues(t *testing.T, config *Config) {
 	assert.Equal(t, &Config{
-		Rest: &RestConfig{
-			BindAddr: "127.0.0.1",
-			BindPort: 8080,
-		},
-		DB: &DBConfig{
-			Addr:     "127.0.0.1",
-			Port:     5432,
-			Username: "api",
-			Password: "api",
-			DBName:   "api",
+		App: &AppConfig{
+			StartPolicy: StartPolicyExitOnError,
+			DB: &DBConfig{
+				Addr:     "127.0.0.1",
+				Port:     5432,
+				Username: "api",
+				Password: "api",
+				DBName:   "api",
+			},
+			Services: &ServicesConfig{
+				Rest: &RestConfig{
+					BindAddr: "127.0.0.1",
+					BindPort: 8080,
+				},
+			},
 		},
 	}, config)
 }
