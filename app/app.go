@@ -28,12 +28,10 @@ func (app *App) RegisterService(service Service) {
 func (app *App) Start() error {
 	for _, service := range app.services {
 		if err := service.Start(); err != nil {
-			switch app.deps.Config.App.StartPolicy {
-			case config.StartPolicyNeverExit:
-				app.logger.Printf(`failed to start "%s" service -> %v`, service.Name(), err)
-			case config.StartPolicyExitOnError:
+			if app.deps.Config.App.StartPolicy == config.StartPolicyExitOnError {
 				return err
 			}
+			app.logger.Printf(`failed to start "%s" service -> %v`, service.Name(), err)
 		}
 	}
 
