@@ -3,6 +3,7 @@ package rest
 import (
 	"context"
 	"github.com/leungyauming/api/app"
+	"github.com/leungyauming/api/common"
 	"github.com/leungyauming/api/common/web"
 	"github.com/leungyauming/api/services/rest/controllers"
 	"github.com/leungyauming/api/services/rest/controllers/v1/user"
@@ -11,6 +12,7 @@ import (
 )
 
 type restService struct {
+	logger *log.Logger
 	webSrv *web.Server
 }
 
@@ -19,7 +21,7 @@ func (service *restService) Start() error {
 	go func() {
 		err := service.webSrv.Start()
 		if err != http.ErrServerClosed {
-			log.Printf("failed to start web server -> %v", err)
+			service.logger.Printf("failed to start web server -> %v", err)
 		}
 	}()
 
@@ -53,5 +55,8 @@ func New(deps *app.Deps) app.Service {
 
 	srv.NoRoute(controllers.NoRoute)
 
-	return &restService{webSrv: srv}
+	return &restService{
+		logger: common.NewLogger("rest"),
+		webSrv: srv,
+	}
 }
