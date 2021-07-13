@@ -7,44 +7,47 @@ import (
 	"github.com/leungyauming/api/app/config"
 	"github.com/leungyauming/api/common"
 	"github.com/leungyauming/api/services/rest"
-	"log"
 	"os"
 	"os/signal"
 )
 
-var shouldInit bool
+var shouldInitDb bool
 
 func init() {
-	flag.BoolVar(&shouldInit, "init", false, "initialization trigger")
+	flag.BoolVar(&shouldInitDb, "init-db", false, "database initialization trigger")
 }
 
-func main() {
+func Main() int {
 	flag.Parse()
 
 	logger := common.NewLogger("main")
 
 	err := saveDefaultConfig()
 	if err != nil {
-		logger.Fatalf("failed to save default config -> %v", err)
+		logger.Printf("failed to save default config -> %v", err)
+		return 1
 	}
 
 	cfg, err := config.ParseFile(configPath)
 	if err != nil {
-		logger.Fatalf("failed to load config -> %v", err)
+		logger.Printf("failed to load config -> %v", err)
+		return 1
 	}
 
 	dbPool, err := initDbPool(cfg.App.DB)
 	if err != nil {
-		logger.Fatalf("failed to initialize database connection pool -> %v", err)
+		logger.Printf("failed to initialize database connection pool -> %v", err)
+		return 1
 	}
 
-	if shouldInit {
-		logger.Println("initializing")
+	if shouldInitDb {
+		logger.Println("initializing database")
 		err := initDb(dbPool)
 		if err != nil {
-			logger.Fatalf("failed to initialize database -> %v", err)
+			logger.Printf("failed to initialize database -> %v", err)
+			return 1
 		}
-		logger.Println("initialized")
+		logger.Println("initialized database")
 	}
 
 	deps := &app.Deps{
@@ -58,7 +61,8 @@ func main() {
 	logger.Println("starting services")
 	err = app_.Start()
 	if err != nil {
-		log.Fatalf("failed to start app -> %v", err)
+		logger.Printf("failed to start app -> %v", err)
+		return 1
 	}
 	logger.Println("started all services")
 
@@ -77,4 +81,10 @@ func main() {
 			logger.Printf("failed to shutdown services -> %v", err)
 		}
 	}
+
+	return 0
+}
+
+func main() {
+	os.Exit(Main())
 }
