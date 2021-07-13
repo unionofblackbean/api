@@ -1,15 +1,20 @@
 package app
 
-import "fmt"
+import (
+	"github.com/leungyauming/api/app/config"
+	"github.com/leungyauming/api/common"
+	"log"
+)
 
 type App struct {
+	logger   *log.Logger
 	services []Service
-
-	deps *Deps
+	deps     *Deps
 }
 
 func New(deps *Deps) *App {
 	app := new(App)
+	app.logger = common.NewLogger("app")
 	app.services = []Service{}
 	app.deps = deps
 
@@ -23,7 +28,12 @@ func (app *App) RegisterService(service Service) {
 func (app *App) Start() error {
 	for _, service := range app.services {
 		if err := service.Start(); err != nil {
-			return fmt.Errorf(`failed to start "%s" service -> %v`, service.Name(), err)
+			switch app.deps.Config.App.StartPolicy {
+			case config.StartPolicyNeverExit:
+				app.logger.Printf(`failed to start "%s" service -> %v`, service.Name(), err)
+			case config.StartPolicyExitOnError:
+				return err
+			}
 		}
 	}
 
