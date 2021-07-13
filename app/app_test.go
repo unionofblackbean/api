@@ -28,6 +28,10 @@ func (s *testService) Shutdown() error {
 	return nil
 }
 
+func (s *testService) Name() string {
+	return "test"
+}
+
 func TestApp_RegisterService(t *testing.T) {
 	app := newApp()
 
