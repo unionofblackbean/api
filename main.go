@@ -26,7 +26,7 @@ func Main() int {
 
 	logger := common.NewLogger("main")
 
-	err := saveDefaultConfig()
+	err := initConfigFile()
 	if err != nil {
 		logger.Printf("failed to save default config -> %v", err)
 		return 1

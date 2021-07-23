@@ -32,7 +32,7 @@ var (
 	configPath = "config.json"
 )
 
-func saveDefaultConfig() error {
+func initConfigFile() error {
 	execDir, err := utils.ExecutableDirectory()
 	if err != nil {
 		return fmt.Errorf("failed to get executable directory -> %v", err)
