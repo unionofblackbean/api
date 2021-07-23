@@ -41,6 +41,8 @@ func (service *restService) Name() string {
 func New(deps *app.Deps) app.Service {
 	srv := web.NewServer(deps.Config.App.Services.Rest.BindAddr, deps.Config.App.Services.Rest.BindPort)
 
+	srv.Use(web.NewIPRateLimiter(deps.Config.App.Services.Rest.RateLimit).Middleware)
+
 	v1Group := srv.Group("/v1")
 	{
 		userGroup := v1Group.Group("/user")

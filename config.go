@@ -22,8 +22,9 @@ var (
 			},
 			Services: &config.ServicesConfig{
 				Rest: &config.RestConfig{
-					BindAddr: "127.0.0.1",
-					BindPort: 8080,
+					BindAddr:  "127.0.0.1",
+					BindPort:  8080,
+					RateLimit: 5,
 				},
 			},
 		},
