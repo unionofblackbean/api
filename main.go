@@ -94,14 +94,14 @@ func Main() int {
 	logger.Println("shutting down services")
 	timer.Start()
 	errs := app_.Shutdown()
-	if len(errs) == 0 {
-		timer.Stop()
-		logger.Printf("shut down all services (%d ms)", timer.Duration().Milliseconds())
-	} else {
+	timer.Stop()
+	if len(errs) != 0 {
 		for err := range errs {
 			logger.Printf("failed to shutdown services -> %v", err)
 		}
+		return 1
 	}
+	logger.Printf("shut down all services (%d ms)", timer.Duration().Milliseconds())
 
 	return 0
 }
