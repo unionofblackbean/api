@@ -13,12 +13,10 @@ type App struct {
 }
 
 func New(deps *Deps) *App {
-	app := new(App)
-	app.logger = common.NewLogger("app")
-	app.services = []Service{}
-	app.deps = deps
-
-	return app
+	return &App{
+		logger: common.NewLogger("app"),
+		deps:   deps,
+	}
 }
 
 func (app *App) RegisterService(service Service) {

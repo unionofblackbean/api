@@ -15,16 +15,16 @@ type Server struct {
 
 func NewServer(addr string, port uint16) *Server {
 	gin.SetMode(gin.ReleaseMode)
+
 	r := gin.New()
 
-	srv := new(Server)
-	srv.Engine = r
-	srv.httpSrv = &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", addr, port),
-		Handler: r,
+	return &Server{
+		Engine: r,
+		httpSrv: &http.Server{
+			Addr:    fmt.Sprintf("%s:%d", addr, port),
+			Handler: r,
+		},
 	}
-
-	return srv
 }
 
 // Start implements app.Service interface

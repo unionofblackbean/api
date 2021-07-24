@@ -17,10 +17,7 @@ type LoginController struct {
 }
 
 func NewLoginController(deps *app.Deps) *LoginController {
-	c := new(LoginController)
-	c.deps = deps
-
-	return c
+	return &LoginController{deps: deps}
 }
 
 func (c *LoginController) Any(ctx *gin.Context) {

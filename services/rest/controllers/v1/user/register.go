@@ -16,10 +16,7 @@ type RegisterController struct {
 }
 
 func NewRegisterController(deps *app.Deps) *RegisterController {
-	c := new(RegisterController)
-	c.deps = deps
-
-	return c
+	return &RegisterController{deps: deps}
 }
 
 func (c *RegisterController) Any(ctx *gin.Context) {

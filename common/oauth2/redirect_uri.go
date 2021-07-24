@@ -28,8 +28,5 @@ func ParseRedirectURI(uri string) (URI, error) {
 		return nil, errors.New("redirect uri must be absolute")
 	}
 
-	ruri := new(redirectURI)
-	ruri.url = rurl
-
-	return ruri, nil
+	return &redirectURI{url: rurl}, nil
 }
