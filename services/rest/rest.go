@@ -6,6 +6,7 @@ import (
 	"github.com/leungyauming/api/common"
 	"github.com/leungyauming/api/common/web"
 	"github.com/leungyauming/api/services/rest/controllers"
+	"github.com/leungyauming/api/services/rest/controllers/v1/session"
 	"github.com/leungyauming/api/services/rest/controllers/v1/user"
 	"log"
 	"net/http"
@@ -45,9 +46,13 @@ func New(deps *app.Deps) app.Service {
 
 	v1Group := srv.Group("/v1")
 	{
+		sessionGroup := v1Group.Group("/session")
+		{
+			sessionGroup.Any("/login", session.NewLoginController(deps).Any)
+		}
+
 		userGroup := v1Group.Group("/user")
 		{
-			userGroup.Any("/login", user.NewLoginController(deps).Any)
 			userGroup.Any("/register", user.NewRegisterController(deps).Any)
 		}
 	}
