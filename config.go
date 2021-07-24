@@ -44,6 +44,7 @@ func initConfigFile() error {
 		if err != nil {
 			return fmt.Errorf("failed to create config file -> %v", err)
 		}
+		defer configFile.Close()
 
 		configBytes, err := json.MarshalIndent(defaultConfig, "", "  ")
 		if err != nil {
