@@ -13,3 +13,4 @@ TODO:
 - [ ] create tests for `oauth2`, `security` and `web` packages
 - [ ] create tests for `common.Logger` and `common.Timer` structs
 - [ ] create tests for `services` package
+- [ ] create tests for `config.go` and `db.go` in main package
