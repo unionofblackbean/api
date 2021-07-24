@@ -7,18 +7,27 @@ import (
 	"github.com/leungyauming/api/app/config"
 	"github.com/leungyauming/api/common"
 	"github.com/leungyauming/api/services/rest"
+	"log"
 	"os"
 	"os/signal"
+	"runtime"
+	"runtime/pprof"
 )
 
 var (
 	shouldInitDb  bool
 	shouldInitCfg bool
+
+	cpuProfileFilename string
+	memProfileFilename string
 )
 
 func init() {
 	flag.BoolVar(&shouldInitDb, "init-db", false, "database initialization trigger")
 	flag.BoolVar(&shouldInitCfg, "only-cfg", false, "only creates config trigger")
+
+	flag.StringVar(&cpuProfileFilename, "pprof-cpu", "", "cpu profile filename")
+	flag.StringVar(&memProfileFilename, "pprof-mem", "", "mem profile filename")
 }
 
 func Main() int {
@@ -26,6 +35,30 @@ func Main() int {
 
 	logger := common.NewLogger("main")
 	timer := common.NewTimer()
+
+	if cpuProfileFilename != "" {
+		logger.Println("creating CPU profile file")
+		timer.Start()
+		cpuProfileFile, err := os.Create(cpuProfileFilename)
+		if err != nil {
+			logger.Printf("failed to create CPU profile file -> %v", err)
+			return 1
+		}
+		defer cpuProfileFile.Close()
+		timer.Stop()
+		logger.Printf("created CPU profile file (%d ms)", timer.Duration().Milliseconds())
+
+		logger.Println("starting CPU profiling")
+		timer.Start()
+		err = pprof.StartCPUProfile(cpuProfileFile)
+		if err != nil {
+			logger.Printf("failed to start CPU profiling -> %v", err)
+			return 1
+		}
+		defer pprof.StopCPUProfile()
+		timer.Stop()
+		logger.Printf("started CPU profiling (%d ms)", timer.Duration().Milliseconds())
+	}
 
 	logger.Print("initializing config file")
 	timer.Start()
@@ -102,6 +135,31 @@ func Main() int {
 		return 1
 	}
 	logger.Printf("shut down all services (%d ms)", timer.Duration().Milliseconds())
+
+	if memProfileFilename != "" {
+		logger.Println("creating memory profile file")
+		timer.Start()
+		memProfileFile, err := os.Create(memProfileFilename)
+		if err != nil {
+			log.Printf("failed to create memory profile file -> %v", err)
+			return 1
+		}
+		defer memProfileFile.Close()
+		timer.Stop()
+		logger.Printf("created memory profile file (%d ms)", timer.Duration().Milliseconds())
+
+		runtime.GC()
+
+		logger.Println("writing memory profile to file")
+		timer.Start()
+		err = pprof.WriteHeapProfile(memProfileFile)
+		if err != nil {
+			log.Printf("failed to write memory profile to file -> %v", err)
+			return 1
+		}
+		timer.Stop()
+		logger.Printf("wrote memory profile to file (%d ms)", timer.Duration().Milliseconds())
+	}
 
 	return 0
 }
