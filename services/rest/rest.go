@@ -47,11 +47,8 @@ func New(deps *app.Deps) app.Service {
 	{
 		userGroup := v1Group.Group("/user")
 		{
-			loginController := user.NewLoginController(deps)
-			userGroup.Any("/login", loginController.Any)
-
-			registerController := user.NewRegisterController(deps)
-			userGroup.Any("/register", registerController.Any)
+			userGroup.Any("/login", user.NewLoginController(deps).Any)
+			userGroup.Any("/register", user.NewRegisterController(deps).Any)
 		}
 	}
 
