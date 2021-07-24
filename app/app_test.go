@@ -13,7 +13,6 @@ func newApp() *App {
 func TestNew(t *testing.T) {
 	app := newApp()
 	assert.NotNil(t, app)
-	assert.NotNil(t, app.services)
 	assert.NotNil(t, app.deps)
 }
 

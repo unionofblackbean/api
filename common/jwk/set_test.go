@@ -9,7 +9,6 @@ import (
 func TestNewSet(t *testing.T) {
 	set := NewSet()
 	assert.NotNil(t, set)
-	assert.NotNil(t, set.Keys)
 }
 
 func TestSet_AddKey(t *testing.T) {
