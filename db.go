@@ -6,10 +6,14 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/leungyauming/api/app/config"
+	"time"
 )
 
 func initDbPool(cfg *config.DBConfig) (*pgxpool.Pool, error) {
-	pool, err := pgxpool.Connect(context.Background(),
+	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Duration(cfg.Timeout)*time.Second)
+	defer cancelFunc()
+
+	pool, err := pgxpool.Connect(ctx,
 		fmt.Sprintf("postgres://%s:%s@%s:%d/%s",
 			cfg.Username, cfg.Password,
 			cfg.Addr, cfg.Port,
