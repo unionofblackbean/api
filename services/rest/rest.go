@@ -57,6 +57,7 @@ func New(deps *app.Deps) app.Service {
 		}
 	}
 
+	srv.Any("/health", controllers.Health)
 	srv.NoRoute(controllers.NoRoute)
 
 	return &restService{
