@@ -44,7 +44,11 @@ func Main() int {
 			logger.Printf("failed to create CPU profile file -> %v", err)
 			return 1
 		}
-		defer cpuProfileFile.Close()
+		defer func() {
+			if err := cpuProfileFile.Close(); err != nil {
+				logger.Printf("failed to close CPU profile file -> %v", err)
+			}
+		}()
 		timer.Stop()
 		logger.Printf("created CPU profile file (%d ms)", timer.Duration().Milliseconds())
 
@@ -144,7 +148,11 @@ func Main() int {
 			log.Printf("failed to create memory profile file -> %v", err)
 			return 1
 		}
-		defer memProfileFile.Close()
+		defer func() {
+			if err := memProfileFile.Close(); err != nil {
+				logger.Printf("failed to close memory profile file -> %v", err)
+			}
+		}()
 		timer.Stop()
 		logger.Printf("created memory profile file (%d ms)", timer.Duration().Milliseconds())
 
