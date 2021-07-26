@@ -36,5 +36,9 @@ func ParseFile(filename string) (*Config, error) {
 		return nil, fmt.Errorf("failed to parse config from reader -> %v", err)
 	}
 
+	if err := file.Close(); err != nil {
+		return nil, fmt.Errorf("failed to close config file -> %v", err)
+	}
+
 	return config, nil
 }

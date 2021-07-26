@@ -44,7 +44,6 @@ func initConfigFile() error {
 		if err != nil {
 			return fmt.Errorf("failed to create config file -> %v", err)
 		}
-		defer configFile.Close()
 
 		configBytes, err := json.MarshalIndent(defaultConfig, "", "  ")
 		if err != nil {
@@ -54,6 +53,10 @@ func initConfigFile() error {
 		_, err = configFile.Write(configBytes)
 		if err != nil {
 			return fmt.Errorf("failed to write default config to file -> %v", err)
+		}
+
+		if err := configFile.Close(); err != nil {
+			return fmt.Errorf("failed to close config file -> %v", err)
 		}
 	}
 
