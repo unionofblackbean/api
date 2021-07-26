@@ -72,6 +72,7 @@ func TestParseFile(t *testing.T) {
 		t.Errorf("failed to create test config -> %v", err)
 		t.FailNow()
 	}
+	defer testConfigFile.Close()
 
 	_, err = testConfigFile.WriteString(testConfigString)
 	if err != nil {
