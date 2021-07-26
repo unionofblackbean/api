@@ -11,10 +11,11 @@ func TestIsFileExists(t *testing.T) {
 	tempDir := t.TempDir()
 
 	testFilename := filepath.Join(tempDir, "test.txt")
-	_, err := os.Create(testFilename)
+	testFile, err := os.Create(testFilename)
 	if err != nil {
 		t.Errorf("failed to create test file -> %v", err)
 	}
+	defer testFile.Close()
 
 	assert.True(t, IsFileExists(testFilename))
 
