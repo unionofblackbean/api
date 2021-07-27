@@ -32,11 +32,16 @@ func (c *LoginController) Any(ctx *gin.Context) {
 			return
 		}
 
+		reqCtx := ctx.Request.Context()
+
 		var dbPwHashEncoded string
-		err := c.deps.Database.QueryRow(context.Background(),
+		err := c.deps.Database.QueryRow(reqCtx,
 			"SELECT user_password_hash_encoded FROM users WHERE user_username=$1;",
 			reqUsername,
 		).Scan(&dbPwHashEncoded)
+		if errors.Is(err, context.Canceled) {
+			return
+		}
 		if err != nil {
 			responses.SendErrorResponse(ctx,
 				http.StatusInternalServerError,
@@ -68,9 +73,12 @@ func (c *LoginController) Any(ctx *gin.Context) {
 
 		sessionIDString := sessionID.String()
 
-		_, err = c.deps.Database.Exec(context.Background(),
+		_, err = c.deps.Database.Exec(reqCtx,
 			"INSERT INTO sessions(session_id, session_ip, user_username) VALUES ($1, $2, $3);",
 			sessionIDString, ctx.ClientIP(), reqUsername)
+		if errors.Is(err, context.Canceled) {
+			return
+		}
 		if err != nil {
 			responses.SendErrorResponse(ctx,
 				http.StatusInternalServerError,
