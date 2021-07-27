@@ -3,6 +3,7 @@ package main
 import (
 	_ "embed"
 	"flag"
+	"fmt"
 	"github.com/leungyauming/api/app"
 	"github.com/leungyauming/api/app/config"
 	"github.com/leungyauming/api/common"
@@ -32,6 +33,8 @@ func init() {
 
 func Main() int {
 	flag.Parse()
+
+	fmt.Println(app.VersionStatement())
 
 	logger := common.NewLogger("main")
 	timer := common.NewTimer()
@@ -71,16 +74,21 @@ func Main() int {
 		logger.Printf("failed to save default config -> %v", err)
 		return 1
 	}
+	timer.Stop()
+	logger.Printf("initialized config file (%d ms)", timer.Duration().Milliseconds())
 	if shouldInitCfg {
 		return 0
 	}
+
+	logger.Print("parsing config")
+	timer.Start()
 	cfg, err := config.ParseFile(configPath)
 	if err != nil {
 		logger.Printf("failed to load config -> %v", err)
 		return 1
 	}
 	timer.Stop()
-	logger.Printf("initialized config file (%d ms)", timer.Duration().Milliseconds())
+	logger.Printf("parsed config (%d ms)", timer.Duration().Milliseconds())
 
 	logger.Print("initializing database connection pool")
 	timer.Start()
