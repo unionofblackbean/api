@@ -27,7 +27,7 @@ var DefaultArgon2idParams = &Argon2idParams{
 }
 
 func Argon2idHashPassword(password string, params *Argon2idParams) ([]byte, []byte, error) {
-	salt, err := GenerateSalt(params.SaltLength)
+	salt, err := GenerateRandomBytes(params.SaltLength)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to generate salt -> %v", err)
 	}

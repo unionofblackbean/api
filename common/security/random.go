@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func GenerateSalt(len int) ([]byte, error) {
+func GenerateRandomBytes(len int) ([]byte, error) {
 	salt := make([]byte, len)
 	_, err := rand.Read(salt)
 	if err != nil {
