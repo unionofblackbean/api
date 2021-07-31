@@ -2,12 +2,12 @@ package rest
 
 import (
 	"context"
-	"github.com/leungyauming/api/app"
-	"github.com/leungyauming/api/common"
-	"github.com/leungyauming/api/common/web"
-	"github.com/leungyauming/api/services/rest/controllers"
-	"github.com/leungyauming/api/services/rest/controllers/v1/session"
-	"github.com/leungyauming/api/services/rest/controllers/v1/user"
+	"github.com/unionofblackbean/api/app"
+	"github.com/unionofblackbean/api/common"
+	"github.com/unionofblackbean/api/common/web"
+	"github.com/unionofblackbean/api/services/rest/controllers"
+	"github.com/unionofblackbean/api/services/rest/controllers/v1/session"
+	"github.com/unionofblackbean/api/services/rest/controllers/v1/user"
 	"log"
 	"net/http"
 )

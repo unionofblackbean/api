@@ -1,4 +1,4 @@
-# api.leungyauming.net
+# api.ubb.asia
 
 > this project is currently in progress
 

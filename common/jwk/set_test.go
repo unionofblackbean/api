@@ -1,8 +1,8 @@
 package jwk
 
 import (
-	"github.com/leungyauming/api/common/jwa"
 	"github.com/stretchr/testify/assert"
+	"github.com/unionofblackbean/api/common/jwa"
 	"testing"
 )
 

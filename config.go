@@ -3,8 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/leungyauming/api/app/config"
-	"github.com/leungyauming/api/common/utils"
+	"github.com/unionofblackbean/api/app/config"
+	"github.com/unionofblackbean/api/common/utils"
 	"os"
 	"path/filepath"
 )

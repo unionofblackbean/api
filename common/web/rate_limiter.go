@@ -2,7 +2,7 @@ package web
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/leungyauming/api/common/responses"
+	"github.com/unionofblackbean/api/common/responses"
 	"golang.org/x/time/rate"
 	"sync"
 )

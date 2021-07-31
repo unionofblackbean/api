@@ -2,8 +2,8 @@ package app
 
 import (
 	"errors"
-	"github.com/leungyauming/api/app/config"
 	"github.com/stretchr/testify/assert"
+	"github.com/unionofblackbean/api/app/config"
 	"testing"
 )
 

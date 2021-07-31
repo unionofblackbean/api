@@ -1,4 +1,4 @@
-module github.com/leungyauming/api
+module github.com/unionofblackbean/api
 
 go 1.16
 

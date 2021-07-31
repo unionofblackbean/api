@@ -11,8 +11,8 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"github.com/leungyauming/api/common/jwa"
-	"github.com/leungyauming/api/common/pools"
+	"github.com/unionofblackbean/api/common/jwa"
+	"github.com/unionofblackbean/api/common/pools"
 	"hash"
 )
 

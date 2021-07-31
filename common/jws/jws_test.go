@@ -4,9 +4,9 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"github.com/leungyauming/api/common/jwa"
-	"github.com/leungyauming/api/common/jwt"
 	"github.com/stretchr/testify/assert"
+	"github.com/unionofblackbean/api/common/jwa"
+	"github.com/unionofblackbean/api/common/jwt"
 	"testing"
 )
 

@@ -3,7 +3,7 @@ package app
 import "fmt"
 
 const (
-	name    = "api.leungyauming.net"
+	name    = "api.ubb.asia"
 	version = "v0.0.0"
 )
 

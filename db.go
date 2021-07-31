@@ -5,7 +5,7 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/leungyauming/api/app/config"
+	"github.com/unionofblackbean/api/app/config"
 	"time"
 )
 

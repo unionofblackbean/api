@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/leungyauming/api/app/config"
-	"github.com/leungyauming/api/common"
+	"github.com/unionofblackbean/api/app/config"
+	"github.com/unionofblackbean/api/common"
 	"log"
 )
 
