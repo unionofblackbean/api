@@ -12,11 +12,11 @@ func NewTimer() *Timer {
 }
 
 func (t *Timer) Start() {
-	t.start = time.Now()
+	t.start = time.Now().UTC()
 }
 
 func (t *Timer) Stop() {
-	t.end = time.Now()
+	t.end = time.Now().UTC()
 }
 
 func (t *Timer) Duration() time.Duration {
