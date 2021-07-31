@@ -2,10 +2,10 @@ package session
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/unionofblackbean/api/app"
 	"github.com/unionofblackbean/api/common/responses"
 	"github.com/unionofblackbean/api/common/security"
@@ -63,15 +63,14 @@ func (c *LoginController) Any(ctx *gin.Context) {
 			return
 		}
 
-		sessionID, err := uuid.NewRandom()
+		sessionIDBytes, err := security.GenerateRandomBytes(32)
 		if err != nil {
 			responses.SendErrorResponse(ctx,
 				http.StatusInternalServerError,
 				fmt.Errorf("failed to generate session id -> %v", err))
 			return
 		}
-
-		sessionIDString := sessionID.String()
+		sessionIDString := base64.RawURLEncoding.EncodeToString(sessionIDBytes)
 
 		_, err = c.deps.Database.Exec(reqCtx,
 			"INSERT INTO sessions(session_id, session_ip, user_username) VALUES ($1, $2, $3);",
