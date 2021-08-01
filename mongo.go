@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func initMongoDBClient(cfg *config.MongoDBConfig) (*mongo.Client, error) {
+func initMongoClient(cfg *config.MongoConfig) (*mongo.Client, error) {
 	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Duration(cfg.Timeout)*time.Second)
 	defer cancelFunc()
 
@@ -19,7 +19,7 @@ func initMongoDBClient(cfg *config.MongoDBConfig) (*mongo.Client, error) {
 				cfg.Username, cfg.Password,
 				cfg.Addr, cfg.Port)))
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect mongodb database -> %v", err)
+		return nil, fmt.Errorf("failed to connect mongo database -> %v", err)
 	}
 
 	return client, nil

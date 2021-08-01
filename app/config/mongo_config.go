@@ -1,6 +1,6 @@
 package config
 
-type MongoDBConfig struct {
+type MongoConfig struct {
 	Addr string `json:"addr"`
 	Port uint16 `json:"port"`
 

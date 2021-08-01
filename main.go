@@ -100,15 +100,15 @@ func Main() int {
 	timer.Stop()
 	logger.Printf("initialized postgres connection pool (%d ms)", timer.Duration().Milliseconds())
 
-	logger.Print("initializing mongodb client")
+	logger.Print("initializing mongo client")
 	timer.Start()
-	mongoDBClient, err := initMongoDBClient(cfg.App.MongoDB)
+	mongoClient, err := initMongoClient(cfg.App.Mongo)
 	if err != nil {
-		logger.Printf("failed to initialize mongodb client -> %v", err)
+		logger.Printf("failed to initialize mongo client -> %v", err)
 		return 1
 	}
 	timer.Stop()
-	logger.Printf("initialized mongodb client (%d ms)", timer.Duration().Milliseconds())
+	logger.Printf("initialized mongo client (%d ms)", timer.Duration().Milliseconds())
 
 	if shouldInitPostgres {
 		logger.Println("initializing postgres")
@@ -124,7 +124,7 @@ func Main() int {
 
 	deps := &app.Deps{
 		Postgres: postgresPool,
-		MongoDB:  mongoDBClient,
+		Mongo:    mongoClient,
 		Config:   cfg,
 	}
 

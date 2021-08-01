@@ -8,7 +8,7 @@ import (
 
 type Deps struct {
 	Postgres *pgxpool.Pool
-	MongoDB  *mongo.Client
+	Mongo    *mongo.Client
 
 	Config *config.Config
 }
