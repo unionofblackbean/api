@@ -16,15 +16,15 @@ import (
 )
 
 var (
-	shouldInitDb  bool
-	shouldInitCfg bool
+	shouldInitPostgres bool
+	shouldInitCfg      bool
 
 	cpuProfileFilename string
 	memProfileFilename string
 )
 
 func init() {
-	flag.BoolVar(&shouldInitDb, "init-db", false, "database initialization trigger")
+	flag.BoolVar(&shouldInitPostgres, "init-postgres", false, "postgres initialization trigger")
 	flag.BoolVar(&shouldInitCfg, "only-cfg", false, "only creates config trigger")
 
 	flag.StringVar(&cpuProfileFilename, "pprof-cpu", "", "cpu profile filename")
@@ -90,30 +90,30 @@ func Main() int {
 	timer.Stop()
 	logger.Printf("parsed config (%d ms)", timer.Duration().Milliseconds())
 
-	logger.Print("initializing database connection pool")
+	logger.Print("initializing postgres connection pool")
 	timer.Start()
-	dbPool, err := initDbPool(cfg.App.DB)
+	postgresPool, err := initPostgresPool(cfg.App.Postgres)
 	if err != nil {
-		logger.Printf("failed to initialize database connection pool -> %v", err)
+		logger.Printf("failed to initialize postgres connection pool -> %v", err)
 		return 1
 	}
 	timer.Stop()
-	logger.Printf("initialized database connection pool (%d ms)", timer.Duration().Milliseconds())
+	logger.Printf("initialized postgres connection pool (%d ms)", timer.Duration().Milliseconds())
 
-	if shouldInitDb {
-		logger.Println("initializing database")
+	if shouldInitPostgres {
+		logger.Println("initializing postgres")
 		timer.Start()
-		err := initDb(dbPool)
+		err := initPostgres(postgresPool)
 		if err != nil {
-			logger.Printf("failed to initialize database -> %v", err)
+			logger.Printf("failed to initialize postgres -> %v", err)
 			return 1
 		}
 		timer.Stop()
-		logger.Printf("initialized database (%d ms)", timer.Duration().Milliseconds())
+		logger.Printf("initialized postgres (%d ms)", timer.Duration().Milliseconds())
 	}
 
 	deps := &app.Deps{
-		Database: dbPool,
+		Postgres: postgresPool,
 		Config:   cfg,
 	}
 

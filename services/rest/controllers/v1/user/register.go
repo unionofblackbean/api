@@ -45,7 +45,7 @@ func (c *RegisterController) Any(ctx *gin.Context) {
 		reqCtx := ctx.Request.Context()
 
 		var userAlreadyExists bool
-		err = c.deps.Database.QueryRow(reqCtx,
+		err = c.deps.Postgres.QueryRow(reqCtx,
 			"SELECT EXISTS(SELECT 1 FROM users WHERE user_username=$1);",
 			usernameForm).Scan(&userAlreadyExists)
 		if errors.Is(err, context.Canceled) {
@@ -67,7 +67,7 @@ func (c *RegisterController) Any(ctx *gin.Context) {
 		salt, pwHash, err := security.Argon2idHashPassword(passwordForm, security.DefaultArgon2idParams)
 		pwHashEncoded := security.Argon2idEncodePasswordHash(salt, pwHash, security.DefaultArgon2idParams)
 
-		_, err = c.deps.Database.Exec(reqCtx,
+		_, err = c.deps.Postgres.Exec(reqCtx,
 			"INSERT INTO users(user_username, user_email, user_password_hash_encoded) VALUES ($1, $2, $3);",
 			usernameForm, email, pwHashEncoded)
 		if errors.Is(err, context.Canceled) {

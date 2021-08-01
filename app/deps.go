@@ -6,6 +6,6 @@ import (
 )
 
 type Deps struct {
-	Database *pgxpool.Pool
+	Postgres *pgxpool.Pool
 	Config   *config.Config
 }

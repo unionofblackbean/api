@@ -1,6 +1,6 @@
 package config
 
-type DBConfig struct {
+type PostgresConfig struct {
 	Addr string `json:"addr"`
 	Port uint16 `json:"port"`
 

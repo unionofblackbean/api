@@ -35,7 +35,7 @@ func (c *LoginController) Any(ctx *gin.Context) {
 		reqCtx := ctx.Request.Context()
 
 		var dbPwHashEncoded string
-		err := c.deps.Database.QueryRow(reqCtx,
+		err := c.deps.Postgres.QueryRow(reqCtx,
 			"SELECT user_password_hash_encoded FROM users WHERE user_username=$1;",
 			reqUsername,
 		).Scan(&dbPwHashEncoded)
@@ -72,7 +72,7 @@ func (c *LoginController) Any(ctx *gin.Context) {
 		}
 		sessionIDString := base64.RawURLEncoding.EncodeToString(sessionIDBytes)
 
-		_, err = c.deps.Database.Exec(reqCtx,
+		_, err = c.deps.Postgres.Exec(reqCtx,
 			"INSERT INTO sessions(session_id, session_ip, user_username) VALUES ($1, $2, $3);",
 			sessionIDString, ctx.ClientIP(), reqUsername)
 		if errors.Is(err, context.Canceled) {

@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func initDbPool(cfg *config.DBConfig) (*pgxpool.Pool, error) {
+func initPostgresPool(cfg *config.PostgresConfig) (*pgxpool.Pool, error) {
 	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Duration(cfg.Timeout)*time.Second)
 	defer cancelFunc()
 
@@ -19,16 +19,16 @@ func initDbPool(cfg *config.DBConfig) (*pgxpool.Pool, error) {
 			cfg.Addr, cfg.Port,
 			cfg.DBName))
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect database -> %v", err)
+		return nil, fmt.Errorf("failed to connect postgres database -> %v", err)
 	}
 
 	return pool, nil
 }
 
-//go:embed schema.sql
-var dbSchema string
+//go:embed postgres_schema.sql
+var postgresSchema string
 
-func initDb(db *pgxpool.Pool) error {
-	_, err := db.Exec(context.Background(), dbSchema)
+func initPostgres(db *pgxpool.Pool) error {
+	_, err := db.Exec(context.Background(), postgresSchema)
 	return err
 }

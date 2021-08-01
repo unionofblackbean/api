@@ -13,7 +13,7 @@ var (
 	defaultConfig = &config.Config{
 		App: &config.AppConfig{
 			StartPolicy: config.StartPolicyExitOnError,
-			DB: &config.DBConfig{
+			Postgres: &config.PostgresConfig{
 				Addr:     "127.0.0.1",
 				Port:     5432,
 				Username: "api",

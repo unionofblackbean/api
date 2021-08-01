@@ -10,7 +10,7 @@ import (
 var testConfigString = `{
 	"app": {
 		"start_policy": "exit_on_error",
-		"db": {
+		"postgres": {
 			"addr": "127.0.0.1",
 			"port": 5432,
 			"username": "api",
@@ -31,7 +31,7 @@ func checkConfigValues(t *testing.T, config *Config) {
 	assert.Equal(t, &Config{
 		App: &AppConfig{
 			StartPolicy: StartPolicyExitOnError,
-			DB: &DBConfig{
+			Postgres: &PostgresConfig{
 				Addr:     "127.0.0.1",
 				Port:     5432,
 				Username: "api",
