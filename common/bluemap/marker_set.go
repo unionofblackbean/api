@@ -1,6 +1,6 @@
 package bluemap
 
-type MarketSet struct {
+type MarkerSet struct {
 	ID          string   `json:"id"`
 	Label       string   `json:"label"`
 	Toggleable  bool     `json:"toggleable"`
