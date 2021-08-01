@@ -18,6 +18,13 @@ var testConfigString = `{
 			"db_name": "api",
 			"timeout": 10
 		},
+		"mongodb": {
+			"addr": "127.0.0.1",
+			"port": 27017,
+			"username": "api",
+			"password": "api",
+			"timeout": 10
+		},
 		"services": {
 			"rest": {
 				"bind_addr": "127.0.0.1",
@@ -38,6 +45,13 @@ func checkConfigValues(t *testing.T, config *Config) {
 				Username: "api",
 				Password: "api",
 				DBName:   "api",
+				Timeout:  10,
+			},
+			MongoDB: &MongoDBConfig{
+				Addr:     "127.0.0.1",
+				Port:     27017,
+				Username: "api",
+				Password: "api",
 				Timeout:  10,
 			},
 			Services: &ServicesConfig{

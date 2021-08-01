@@ -21,6 +21,13 @@ var (
 				DBName:   "api",
 				Timeout:  10,
 			},
+			MongoDB: &config.MongoDBConfig{
+				Addr:     "127.0.0.1",
+				Port:     27017,
+				Username: "api",
+				Password: "api",
+				Timeout:  10,
+			},
 			Services: &config.ServicesConfig{
 				Rest: &config.RestConfig{
 					BindAddr:  "127.0.0.1",
