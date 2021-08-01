@@ -2,12 +2,13 @@ package rest
 
 import (
 	"context"
+	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/unionofblackbean/api/app"
 	"github.com/unionofblackbean/api/common"
+	"github.com/unionofblackbean/api/common/responses"
 	"github.com/unionofblackbean/api/common/web"
-	"github.com/unionofblackbean/api/services/rest/controllers"
-	"github.com/unionofblackbean/api/services/rest/controllers/v1/session"
-	"github.com/unionofblackbean/api/services/rest/controllers/v1/user"
+	"github.com/unionofblackbean/api/services/rest/v1"
 	"log"
 	"net/http"
 )
@@ -39,26 +40,20 @@ func (service *restService) Name() string {
 	return "REST"
 }
 
+func noRoute(ctx *gin.Context) {
+	responses.SendErrorResponse(ctx,
+		http.StatusNotFound,
+		errors.New("unknown endpoint"))
+}
+
 func New(deps *app.Deps) app.Service {
 	srv := web.NewServer(deps.Config.App.Services.Rest.BindAddr, deps.Config.App.Services.Rest.BindPort)
 
 	srv.Use(web.NewIPRateLimiter(deps.Config.App.Services.Rest.RateLimit).Middleware)
 
-	v1Group := srv.Group("/v1")
-	{
-		sessionGroup := v1Group.Group("/session")
-		{
-			sessionGroup.Any("/login", session.NewLoginController(deps).Any)
-		}
+	v1.RegisterEndpoints(srv, deps)
 
-		userGroup := v1Group.Group("/user")
-		{
-			userGroup.Any("/register", user.NewRegisterController(deps).Any)
-		}
-	}
-
-	srv.Any("/health", controllers.Health)
-	srv.NoRoute(controllers.NoRoute)
+	srv.NoRoute(noRoute)
 
 	return &restService{
 		logger: common.NewLogger("rest"),
