@@ -15,7 +15,8 @@ var testConfigString = `{
 			"port": 5432,
 			"username": "api",
 			"password": "api",
-			"db_name": "api"
+			"db_name": "api",
+			"timeout": 10
 		},
 		"services": {
 			"rest": {
@@ -37,6 +38,7 @@ func checkConfigValues(t *testing.T, config *Config) {
 				Username: "api",
 				Password: "api",
 				DBName:   "api",
+				Timeout:  10,
 			},
 			Services: &ServicesConfig{
 				Rest: &RestConfig{

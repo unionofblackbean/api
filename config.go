@@ -19,6 +19,7 @@ var (
 				Username: "api",
 				Password: "api",
 				DBName:   "api",
+				Timeout:  10,
 			},
 			Services: &config.ServicesConfig{
 				Rest: &config.RestConfig{
