@@ -35,3 +35,21 @@ type Marker struct {
 	LineWidth int         `json:"lineWidth,omitempty"`
 	LineColor linalg.RGBA `json:"lineColor,omitempty"`
 }
+
+func (m *Marker) IsValid() bool {
+	if m.ID == "" || m.Map == "" || m.Label == "" {
+		return false
+	}
+
+	switch m.Type {
+	case MarkerTypePOI:
+	case MarkerTypeHTML:
+	case MarkerTypeExtrude:
+	case MarkerTypeLine:
+	case MarkerTypeShape:
+	default:
+		return false
+	}
+
+	return true
+}
