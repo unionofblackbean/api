@@ -161,7 +161,7 @@ func Main() int {
 	logger.Println("disconnecting mongo client")
 	timer.Start()
 	if err := disconnectMongoClient(cfg.App.Mongo, mongoClient); err != nil {
-		logger.Printf("failed to disconnect mongo client -> $v", err)
+		logger.Printf("failed to disconnect mongo client -> %v", err)
 	}
 	timer.Stop()
 	logger.Printf("disconnected mongo client (%d ms)", timer.Duration().Milliseconds())
