@@ -155,9 +155,22 @@ func Main() int {
 		for err := range errs {
 			logger.Printf("failed to shutdown services -> %v", err)
 		}
-		return 1
 	}
 	logger.Printf("shut down all services (%d ms)", timer.Duration().Milliseconds())
+
+	logger.Println("disconnecting mongo client")
+	timer.Start()
+	if err := disconnectMongoClient(cfg.App.Mongo, mongoClient); err != nil {
+		logger.Printf("failed to disconnect mongo client -> $v", err)
+	}
+	timer.Stop()
+	logger.Printf("disconnected mongo client (%d ms)", timer.Duration().Milliseconds())
+
+	logger.Println("closing postgres connection pool")
+	timer.Start()
+	postgresPool.Close()
+	timer.Stop()
+	logger.Printf("closed postgres connection pool (%d ms)", timer.Duration().Milliseconds())
 
 	if memProfileFilename != "" {
 		logger.Println("creating memory profile file")

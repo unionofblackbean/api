@@ -24,3 +24,14 @@ func initMongoClient(cfg *config.MongoConfig) (*mongo.Client, error) {
 
 	return client, nil
 }
+
+func disconnectMongoClient(cfg *config.MongoConfig, client *mongo.Client) error {
+	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Duration(cfg.Timeout)*time.Second)
+	defer cancelFunc()
+
+	if err := client.Disconnect(ctx); err != nil {
+		return fmt.Errorf("failed to disconnect mongo client -> %v", err)
+	}
+
+	return nil
+}
