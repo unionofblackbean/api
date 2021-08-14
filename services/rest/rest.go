@@ -49,7 +49,10 @@ func noRoute(ctx *gin.Context) {
 func New(deps *app.Deps) app.Service {
 	srv := web.NewServer(deps.Config.App.Services.Rest.BindAddr, deps.Config.App.Services.Rest.BindPort)
 
-	srv.Use(web.NewIPRateLimiter(deps.Config.App.Services.Rest.RateLimit).Middleware)
+	rateLimit := deps.Config.App.Services.Rest.RateLimit
+	if rateLimit > 0 {
+		srv.Use(web.NewIPRateLimiter(rateLimit).Middleware)
+	}
 
 	v1.RegisterEndpoints(srv, deps)
 
