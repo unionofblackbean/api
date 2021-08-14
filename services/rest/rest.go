@@ -3,6 +3,7 @@ package rest
 import (
 	"context"
 	"errors"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/unionofblackbean/api/app"
 	"github.com/unionofblackbean/api/common"
@@ -53,6 +54,8 @@ func New(deps *app.Deps) app.Service {
 	if rateLimit > 0 {
 		srv.Use(web.NewIPRateLimiter(rateLimit).Middleware)
 	}
+
+	srv.Use(cors.Default())
 
 	v1.RegisterEndpoints(srv, deps)
 
