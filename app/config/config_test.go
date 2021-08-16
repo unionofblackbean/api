@@ -29,7 +29,8 @@ var testConfigString = `{
 			"rest": {
 				"bind_addr": "127.0.0.1",
 				"bind_port": 8081,
-				"rate_limit": 5
+				"rate_limit": 5,
+				"session_expire_time": 604800
 			}
 		}
 	}
@@ -56,9 +57,10 @@ func checkConfigValues(t *testing.T, config *Config) {
 			},
 			Services: &ServicesConfig{
 				Rest: &RestConfig{
-					BindAddr:  "127.0.0.1",
-					BindPort:  8081,
-					RateLimit: 5,
+					BindAddr:          "127.0.0.1",
+					BindPort:          8081,
+					RateLimit:         5,
+					SessionExpireTime: 604800,
 				},
 			},
 		},

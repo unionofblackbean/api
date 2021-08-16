@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/unionofblackbean/api/app"
+	"github.com/unionofblackbean/api/common"
 	"github.com/unionofblackbean/api/common/responses"
 	"github.com/unionofblackbean/api/common/security"
 	"net/http"
@@ -72,9 +73,10 @@ func (c *LoginController) Any(ctx *gin.Context) {
 		}
 		sessionIDString := base64.RawURLEncoding.EncodeToString(sessionIDBytes)
 
+		sessionExpireTime := c.deps.Config.App.Services.Rest.SessionExpireTime
 		_, err = c.deps.Postgres.Exec(reqCtx,
-			"INSERT INTO sessions(session_id, session_ip, user_username) VALUES ($1, $2, $3);",
-			sessionIDString, ctx.ClientIP(), reqUsername)
+			"INSERT INTO sessions(session_id, session_ip, session_creation_time, session_expire_time, user_username) VALUES ($1, $2, $3, $4, $5);",
+			sessionIDString, ctx.ClientIP(), common.NowUTC(), sessionExpireTime, reqUsername)
 		if errors.Is(err, context.Canceled) {
 			return
 		}

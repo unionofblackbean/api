@@ -9,9 +9,11 @@ CREATE TABLE users
 
 CREATE TABLE sessions
 (
-    session_id    TEXT,
-    session_ip    TEXT,
-    user_username TEXT
+    session_id            TEXT,
+    session_ip            TEXT,
+    session_creation_time TIMESTAMP,
+    session_expire_time   BIGINT,
+    user_username         TEXT
 );
 
 ALTER TABLE sessions
